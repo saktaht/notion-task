@@ -1,7 +1,7 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import { exec } from "child_process";
-// import {pool, markTaskCompleted, isTaskCompleted} from "./db/database"
+import {pool, markTaskCompleted, isTaskCompleted} from "./db/database"
 
 dotenv.config();
 
@@ -60,69 +60,69 @@ const fetchTodayTasks = async () => {
 
 
 // ✅ タスクの完了状況をチェック
-const checkTasks = async () => {
-  const tasks = await fetchTodayTasks();
-
-  if (tasks.length === 0) {
-    console.log("📅 今日のタスクはありません。");
-    return;
-  }
-
-  // 🔍 タスクの「Status」プロパティをチェック
-  const incompleteTasks = tasks.filter((task: any) => {
-    const isChecked = task.properties?.完了?.checkbox;
-    return isChecked !== true; // チェックされていない（未完了）タスクを抽出
-});
-
-  if (incompleteTasks.length === 0) {
-    // playSound();
-    console.log("タスク完了!!!")
-  } else {
-    console.log(`⏳ 未完了タスク: ${incompleteTasks.length} 件`);
-  }
-};
-
-// ✅ 30秒ごとにチェック
-setInterval(checkTasks, 5000);
-
-
-
 // const checkTasks = async () => {
-//   if (await isTaskCompleted()) {
-//     console.log("🎉 今日のタスクはすでに完了済み");
-//     if (intervalId) clearInterval(intervalId);
-//     restartAtMidnight();
+//   const tasks = await fetchTodayTasks();
+
+//   if (tasks.length === 0) {
+//     console.log("📅 今日のタスクはありません。");
 //     return;
 //   }
 
-//   const tasks = await fetchTodayTasks();
+//   // 🔍 タスクの「Status」プロパティをチェック
 //   const incompleteTasks = tasks.filter((task: any) => {
 //     const isChecked = task.properties?.完了?.checkbox;
-//     return isChecked !== true;
-//   });
+//     return isChecked !== true; // チェックされていない（未完了）タスクを抽出
+// });
 
 //   if (incompleteTasks.length === 0) {
-//     console.log("🎉 タスク完了!!!");
-//     await markTaskCompleted();
-//     if (intervalId) clearInterval(intervalId);
-//     restartAtMidnight();
+//     // playSound();
+//     console.log("タスク完了!!!")
 //   } else {
 //     console.log(`⏳ 未完了タスク: ${incompleteTasks.length} 件`);
 //   }
 // };
 
-// const restartAtMidnight = () => {
-//   const now = new Date();
-//   const tomorrow = new Date(now);
-//   tomorrow.setDate(now.getDate() + 1);
-//   tomorrow.setHours(0, 0, 0, 0);
+// // ✅ 30秒ごとにチェック
+// setInterval(checkTasks, 5000);
 
-//   const delay = tomorrow.getTime() - now.getTime();
-//   console.log(`⏳ 次のチェックは ${delay / 1000 / 60} 分後`);
 
-//   setTimeout(() => {
-//     intervalId = setInterval(checkTasks, 5000);
-//   }, delay);
-// };
 
-// let intervalId: NodeJS.Timeout | null = setInterval(checkTasks, 5000);
+const checkTasks = async () => {
+  if (await isTaskCompleted()) {
+    console.log("🎉 今日のタスクはすでに完了済み");
+    if (intervalId) clearInterval(intervalId);
+    restartAtMidnight();
+    return;
+  }
+
+  const tasks = await fetchTodayTasks();
+  const incompleteTasks = tasks.filter((task: any) => {
+    const isChecked = task.properties?.完了?.checkbox;
+    return isChecked !== true;
+  });
+
+  if (incompleteTasks.length === 0) {
+    console.log("🎉 タスク完了!!!");
+    await markTaskCompleted();
+    if (intervalId) clearInterval(intervalId);
+    restartAtMidnight();
+  } else {
+    console.log(`⏳ 未完了タスク: ${incompleteTasks.length} 件`);
+  }
+};
+
+const restartAtMidnight = () => {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+
+  const delay = tomorrow.getTime() - now.getTime();
+  console.log(`⏳ 次のチェックは ${delay / 1000 / 60} 分後`);
+
+  setTimeout(() => {
+    intervalId = setInterval(checkTasks, 5000);
+  }, delay);
+};
+
+let intervalId: NodeJS.Timeout | null = setInterval(checkTasks, 5000);
