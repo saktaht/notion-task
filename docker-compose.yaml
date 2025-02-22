@@ -1,0 +1,49 @@
+services:
+  db: 
+    container_name: db
+    build: 
+      dockerfile: docker/db/Dockerfile
+      context: .
+    volumes:
+      - type: volume
+        source: db-store
+        target: /var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+  
+  front: 
+    container_name: notion-app
+    build: 
+      dockerfile: docker/app/Dockerfile
+      context: .
+    volumes:
+      - type: bind
+        source: ./app
+        target: /src/app
+      - type: bind
+        source: ./package.json
+        target: /src/package.json
+      - type: bind
+        source: ./tsconfig.json
+        target: /src/tsconfig.json
+      # node_modules や .next は名前付きボリュームで管理（ホストの影響を受けない）
+      - type: volume
+        source: node_modules
+        target: /src/node_modules 
+    stdin_open: true
+    tty: true
+    environment:
+      - WATCHPACK_POLLING=true
+    env_file:
+      - .env 
+    command: sh -c "npm start"
+
+volumes:
+  db-store:
+  node_modules:
