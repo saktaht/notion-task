@@ -1,7 +1,8 @@
 import axios from "axios";
 import dotenv from "dotenv";
 import { exec } from "child_process";
-import {pool, markTaskCompleted, isTaskCompleted} from "./db/database"
+import { markTaskCompleted, isTaskCompleted } from "./db/database"
+import { FetchTodayTasksResult } from "./types/notion";
 
 dotenv.config();
 
@@ -27,9 +28,9 @@ console.log(getTodayDateJST()); // "2025-02-23"
 // };
 
 // ✅ Notion API から「今日のタスク」を取得
-const fetchTodayTasks = async () => {
+const fetchTodayTasks = async (): Promise<FetchTodayTasksResult> => {
   try {
-    const response = await axios.post(
+    const response = await axios.post<{ results: FetchTodayTasksResult }>(
       `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
       {
         filter: {
@@ -57,35 +58,19 @@ const fetchTodayTasks = async () => {
   }
 };
 
+const restartAtMidnight = () => {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
 
+  const delay = tomorrow.getTime() - now.getTime();
+  console.log(`⏳ 次のチェックは ${delay / 1000 / 60 / 60} 時間後`);
 
-// ✅ タスクの完了状況をチェック
-// const checkTasks = async () => {
-//   const tasks = await fetchTodayTasks();
-
-//   if (tasks.length === 0) {
-//     console.log("📅 今日のタスクはありません。");
-//     return;
-//   }
-
-//   // 🔍 タスクの「Status」プロパティをチェック
-//   const incompleteTasks = tasks.filter((task: any) => {
-//     const isChecked = task.properties?.完了?.checkbox;
-//     return isChecked !== true; // チェックされていない（未完了）タスクを抽出
-// });
-
-//   if (incompleteTasks.length === 0) {
-//     // playSound();
-//     console.log("タスク完了!!!")
-//   } else {
-//     console.log(`⏳ 未完了タスク: ${incompleteTasks.length} 件`);
-//   }
-// };
-
-// // ✅ 30秒ごとにチェック
-// setInterval(checkTasks, 5000);
-
-
+  setTimeout(() => {
+    intervalId = setInterval(checkTasks, 5000);
+  }, delay);
+};
 
 const checkTasks = async () => {
   if (await isTaskCompleted()) {
@@ -109,20 +94,6 @@ const checkTasks = async () => {
   } else {
     console.log(`⏳ 未完了タスク: ${incompleteTasks.length} 件`);
   }
-};
-
-const restartAtMidnight = () => {
-  const now = new Date();
-  const tomorrow = new Date(now);
-  tomorrow.setDate(now.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
-
-  const delay = tomorrow.getTime() - now.getTime();
-  console.log(`⏳ 次のチェックは ${delay / 1000 / 60} 分後`);
-
-  setTimeout(() => {
-    intervalId = setInterval(checkTasks, 5000);
-  }, delay);
 };
 
 let intervalId: NodeJS.Timeout | null = setInterval(checkTasks, 5000);

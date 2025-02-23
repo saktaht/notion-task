@@ -54,4 +54,4 @@ const isTaskCompleted = async (): Promise<boolean> => {
   }
 };
 
-export {pool, markTaskCompleted, isTaskCompleted};
+export {markTaskCompleted, isTaskCompleted};
