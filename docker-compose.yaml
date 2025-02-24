@@ -37,10 +37,14 @@ services:
       - type: volume
         source: node_modules
         target: /src/node_modules 
+      - type: volume
+        source: pubuic_data
+        target: /src/public
     stdin_open: true
     tty: true
     environment:
       - WATCHPACK_POLLING=true
+      - WS_HOST=host.docker.internal # これでdockerとホストの通信を可能にしてる
     env_file:
       - .env 
     command: sh -c "npm start"
@@ -48,3 +52,4 @@ services:
 volumes:
   db-store:
   node_modules:
+  pubuic_data:
