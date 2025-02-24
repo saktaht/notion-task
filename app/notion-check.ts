@@ -1,8 +1,8 @@
 import axios from "axios";
 import dotenv from "dotenv";
-import { exec } from "child_process";
 import { markTaskCompleted, isTaskCompleted } from "./db/database"
 import { FetchTodayTasksResult } from "./types/notion";
+import { playSound } from "./playSound";
 
 dotenv.config();
 
@@ -18,14 +18,6 @@ const getTodayDateJST = () => {
 };
 
 console.log(getTodayDateJST()); // "2025-02-23"
-
-// ✅ 音を鳴らす関数
-// const playSound = () => {
-//   console.log("🎵 全てのタスクが完了しました！");
-//   exec("afplay success.mp3", (error) => {
-//     if (error) console.error("Error playing sound:", error);
-//   });
-// };
 
 // ✅ Notion API から「今日のタスク」を取得
 const fetchTodayTasks = async (): Promise<FetchTodayTasksResult> => {
@@ -90,6 +82,7 @@ const checkTasks = async () => {
     console.log("🎉 タスク完了!!!");
     await markTaskCompleted();
     if (intervalId) clearInterval(intervalId);
+    playSound();
     restartAtMidnight();
   } else {
     console.log(`⏳ 未完了タスク: ${incompleteTasks.length} 件`);

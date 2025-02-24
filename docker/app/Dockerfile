@@ -4,4 +4,4 @@ WORKDIR /src
 
 COPY package.json* ./
 
-RUN npm install
+RUN npm install && apt update && apt install -y alsa-utils
