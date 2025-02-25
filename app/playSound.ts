@@ -6,16 +6,16 @@ import WebSocket from "ws";
 const ws = new WebSocket("ws://host.docker.internal:8080"); // ホストの WebSocket サーバーに接続
 
 ws.on("open", () => {
-  console.log("✅ WebSocket 接続成功");
+  console.log("WebSocket 接続成功");
 });
 
 ws.on("error", (error) => {
-  console.error("❌ WebSocket エラー:", error);
+  console.error("WebSocket エラー:", error);
 });
 
 export const playSound = () => {
   const soundPath = path.join(__dirname, "../public/demo.mp3");
-  console.log(`🎵 全てのタスクが完了しました！再生ファイル: ${soundPath}`);
+  console.log(`全てのタスクが完了しました！再生ファイル: ${soundPath}`);
 
   let command = "";
 
@@ -24,7 +24,7 @@ export const playSound = () => {
   } else if (os.platform() === "win32") {
     command = `powershell -c (New-Object Media.SoundPlayer '${soundPath}').PlaySync()`; // Windows
   } else if (os.platform() === "linux") {
-    console.log("🔊 Docker からホストに音声再生リクエストを送信");
+    console.log("Docker からホストに音声再生リクエストを送信");
     
     // WebSocket が開いているときだけ送信
     if (ws.readyState === WebSocket.OPEN) {

@@ -3,19 +3,26 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "ts-node app/notion-check.ts",
-    "build": "tsc",
-    "socket": "npx ts-node app/webSocket.ts"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/axios": "^0.9.36",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.13.5",
     "@types/pg": "^8.11.11",
     "@types/ws": "^8.5.14",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "jest": "^29.7.0",
+    "prettier": "^3.5.2",
+    "ts-jest": "^29.2.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   },
