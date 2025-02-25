@@ -6,12 +6,12 @@ import { playSound } from "./playSound";
 
 dotenv.config();
 
-// ✅ Notion API 設定
+// Notion API 設定
 const NOTION_API_KEY = process.env.NOTION_API_KEY;
 const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 
 // 今日の日付を取得（YYYY-MM-DD 形式）/ "2025-02-23T05:35:50.123Z"をTを基準に分割し、日付部分だけを取り出す
-const getTodayDateJST = () => {
+export const getTodayDateJST = () => {
   const now = new Date();
   now.setHours(now.getHours() + 9); // JSTに変換
   return now.toISOString().split("T")[0];
@@ -19,8 +19,8 @@ const getTodayDateJST = () => {
 
 console.log(getTodayDateJST()); // "2025-02-23"
 
-// ✅ Notion API から「今日のタスク」を取得
-const fetchTodayTasks = async (): Promise<FetchTodayTasksResult> => {
+// Notion API から「今日のタスク」を取得
+export const fetchTodayTasks = async (): Promise<FetchTodayTasksResult> => {
   try {
     const response = await axios.post<{ results: FetchTodayTasksResult }>(
       `https://api.notion.com/v1/databases/${DATABASE_ID}/query`,
@@ -41,7 +41,7 @@ const fetchTodayTasks = async (): Promise<FetchTodayTasksResult> => {
       }
     );
 
-    console.log("📌 Notion API Response:", JSON.stringify(response.data, null, 2));
+    console.log("Notion API Response:", JSON.stringify(response.data, null, 2));
 
     return response.data.results;
   } catch (error) {
@@ -50,23 +50,23 @@ const fetchTodayTasks = async (): Promise<FetchTodayTasksResult> => {
   }
 };
 
-const restartAtMidnight = () => {
+export const restartAtMidnight = () => {
   const now = new Date();
   const tomorrow = new Date(now);
   tomorrow.setDate(now.getDate() + 1);
   tomorrow.setHours(0, 0, 0, 0);
 
   const delay = tomorrow.getTime() - now.getTime();
-  console.log(`⏳ 次のチェックは ${delay / 1000 / 60 / 60} 時間後`);
+  console.log(`次のチェックは ${delay / 1000 / 60 / 60} 時間後`);
 
   setTimeout(() => {
     intervalId = setInterval(checkTasks, 5000);
   }, delay);
 };
 
-const checkTasks = async () => {
+export const checkTasks = async () => {
   if (await isTaskCompleted()) {
-    console.log("🎉 今日のタスクはすでに完了済み");
+    console.log("今日のタスクはすでに完了済み");
     if (intervalId) clearInterval(intervalId);
     restartAtMidnight();
     return;
@@ -79,13 +79,13 @@ const checkTasks = async () => {
   });
 
   if (incompleteTasks.length === 0) {
-    console.log("🎉 タスク完了!!!");
+    console.log("タスク完了!!!");
     await markTaskCompleted();
     if (intervalId) clearInterval(intervalId);
     playSound();
     restartAtMidnight();
   } else {
-    console.log(`⏳ 未完了タスク: ${incompleteTasks.length} 件`);
+    console.log(`未完了タスク: ${incompleteTasks.length} 件`);
   }
 };
 

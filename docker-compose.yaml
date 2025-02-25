@@ -33,6 +33,12 @@ services:
       - type: bind
         source: ./tsconfig.json
         target: /src/tsconfig.json
+      # - type: bind
+      #   source: ./tests
+      #   target: /src/tests
+      - type: bind
+        source: ./jest.config.js
+        target: /src/jest.config.js
       # node_modules や .next は名前付きボリュームで管理（ホストの影響を受けない）
       - type: volume
         source: node_modules
